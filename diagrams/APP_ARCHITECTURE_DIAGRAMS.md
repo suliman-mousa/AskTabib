@@ -23,7 +23,6 @@
 | P2 | D6 FCM → Meet join | Notification ops |
 | P3 | D8 Role routing | Dual-role navigation |
 
-Operational knobs (client IDs, SHA-1, iOS checklists) live in [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md) — not duplicated here.
 
 ---
 
