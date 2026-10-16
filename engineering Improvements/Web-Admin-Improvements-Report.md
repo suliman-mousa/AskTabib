@@ -110,7 +110,4 @@ Vitest, Testing Library, MSW, jest-axe, Playwright, shared `src/test` helpers, a
 ## 6. Closing
 
 The right people get in, bookings surface faster and reliably, requests speak the two timezones the API understands, and an automated safety net now surrounds these changes, including the security logic itself. Remaining gaps are mostly platform-level (session storage model, dependency majors) and further domain-screen test coverage.
-
-*Companion docs: `doc/testing-report.md`, `TESTING.md`.*
-
 ---
