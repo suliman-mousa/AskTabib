@@ -8,7 +8,7 @@
 | **Scope** | Web SPA under `/dashboard/`; Laravel API and Firebase are external systems |
 | **Audience** | Engineering leads, architects, maintainers, onboarding |
 | **Date** | 16 October 2026 |
-| **Related** | [testing-report.md](./testing-report.md) · [improvements-report.md](./engineering%Improvements/Web-Admin-Improvements-Report.md) · [diagrams-report.md](./diagrams/Web-Admin-Diagrams.md) |
+| **Related** | [testing-report.md](./testing-report.md) · [improvements-report.md](./engineering Improvements/Web-Admin-Improvements-Report.md) · [diagrams-report.md](./diagrams/Web-Admin-Diagrams.md) |
 
 ---
 
