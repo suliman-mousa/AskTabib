@@ -169,7 +169,7 @@ Feature modules (current):
 
 Shared components in `core/`: router, Dio, FCM pipeline, URL safety, theme.
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D3](./ARCHITECTURE_DIAGRAMS.md#d3-c4-component-flutter-client)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D3](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d3-c4-component-flutter-client)
 
 ### 6.4 Clean Architecture component (per feature)
 
