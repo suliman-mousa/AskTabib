@@ -11,7 +11,7 @@
 | **Mobile application id** | `com.asktabib.app` |
 | **API base** | `https://asktabib.com/api/` |
 | **Audience** | Engineering leads, architects, senior developers, security reviewers |
-| **Related docs** | [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md),[`SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md`](./SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md) |
+| **Related docs** | [`ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md),[`SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md`](./SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md) |
 
 ---
 
@@ -44,7 +44,7 @@ Per ISO/IEC/IEEE 42010, an AD separates:
 | **Stakeholders** | Product, mobile engineering, backend, security, QA, operations |
 | **Concerns** | Telehealth booking, doctor operations, secure Meet joining, reliability of push |
 | **Viewpoints** | Context, Containers, Components (layers), Deployment / trust, Dynamic (runtime) |
-| **Views** | Sections 4–8 below + diagrams in [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md) |
+| **Views** | Sections 4–8 below + diagrams in [`ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md) |
 | **Architecture decisions** | Section 9 (ADR-style rationale) |
 
 Notation is intentionally **C4 + Mermaid**: notation-independent in spirit, tool-friendly for Git-hosted docs.
@@ -70,9 +70,6 @@ External systems that define the runtime landscape:
 | Google Cloud OAuth project | Native Sign-In + server-side code exchange for Calendar / Meet |
 | Firebase project | Device registration + FCM delivery |
 | Google Meet / Calendar APIs | Hosted video sessions; Meet URLs consumed by the app via allowlisted launch |
-
-Cloud projects are **intentionally split** (OAuth vs FCM). Details: [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md).
-
 ---
 
 ## 4. Stakeholder concerns
@@ -138,7 +135,7 @@ Feature business rules do **not** belong in `core/`.
 **Software systems:** AskTabib App, AskTabib Backend, Google Identity/Calendar/Meet, Firebase/FCM  
 **Relationships:** App authenticates and calls API; doctor links Google; backend creates Meet events; FCM notifies devices; app opens allowlisted Meet URLs.
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D1](./ARCHITECTURE_DIAGRAMS.md#d1-c4-system-context)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D1](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d1-c4-system-context)
 
 ### 6.2 C4 Level 2 — Containers
 
@@ -155,7 +152,7 @@ Inside the mobile client (logical containers / major runtime units):
 
 External containers: Laravel API, Google token endpoint, Google Calendar, FCM.
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D2](./ARCHITECTURE_DIAGRAMS.md#d2-c4-container)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D2](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d2-c4-container)
 
 ### 6.3 C4 Level 3 — Components (Flutter client)
 
@@ -192,7 +189,7 @@ pages / widgets
                                          Dio / SDK / storage
 ```
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D4](./ARCHITECTURE_DIAGRAMS.md#d4-clean-architecture-dependency-rule)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D4](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d4-clean-architecture-dependency-rule)
 
 ---
 
@@ -229,8 +226,8 @@ Meet is **not** embedded WebRTC in-app. Architecture:
 4. **Join (patient/doctor):** allowlisted open of `meet.google.com` (+ local incoming-call UX when applicable).
 
 Client secret and token exchange stay **only** on Laravel.  
-→ Primary sequence diagram: [`ARCHITECTURE_DIAGRAMS.md` § D5](./ARCHITECTURE_DIAGRAMS.md#d5-google-meet-end-to-end-mechanism-primary)  
-→ Ops detail: [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md)
+→ Primary sequence diagram: [`ARCHITECTURE_DIAGRAMS.md` § D5](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d5-google-meet-end-to-end-mechanism-primary)  
+
 
 ### 7.4 Push notification pipeline
 
@@ -245,7 +242,7 @@ Centralized in `lib/core/services/`:
 | `LocalNotificationService` | Local display |
 | Meeting overlay / call controller | Full-screen “join Meet” experience |
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D6](./ARCHITECTURE_DIAGRAMS.md#d6-fcm-push-and-meet-join)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D6](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d6-fcm-push-and-meet-join)
 
 ---
 
@@ -328,7 +325,7 @@ lib/features/<feature>/
 | Firebase ↔ Device | FCM data/notification | Project `asktabib-eccde`; token sync to backend |
 | App ↔ Browser / Meet app | Meet URL launch | `SafeExternalUrl` host allowlist |
 
-→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D7](./ARCHITECTURE_DIAGRAMS.md#d7-trust-boundaries--secret-placement)
+→ Diagram: [`ARCHITECTURE_DIAGRAMS.md` § D7](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md#d7-trust-boundaries--secret-placement)
 
 ---
 
@@ -350,8 +347,8 @@ lib/features/<feature>/
 
 1. Feature modules still obey Presentation → Domain ← Data.  
 2. New privileged integrations (OAuth, payments, media) keep secrets off-device.  
-3. Diagrams in [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md) are updated for material structural change.  
-4. Meet / FCM operational truth remains in [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md).
+3. Diagrams in [`ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md) are updated for material structural change.  
+
 
 **Change control:** treat material architecture changes as ADRs (append to §9) and update the corresponding C4 / sequence diagrams in the same PR when feasible.
 
