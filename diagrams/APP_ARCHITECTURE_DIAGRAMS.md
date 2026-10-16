@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|--------|
 | **Document type** | Architecture views (diagram pack) |
-| **Companion AD** | [`ARCHITECTURE_REPORT.md`](./ARCHITECTURE_REPORT.md) |
+| **Companion AD** | [`ARCHITECTURE_REPORT.md`](../App-Architecture.md) |
 | **Standards** | ISO/IEC/IEEE 42010 viewpoints · C4 model · UML-style sequence (Mermaid) |
 | **Audience** | Architects, senior engineers, onboarding, design reviews |
 | **Rendering** | Mermaid (GitHub / VS Code / most Markdown previewers) |
