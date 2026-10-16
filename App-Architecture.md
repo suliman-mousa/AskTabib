@@ -11,7 +11,7 @@
 | **Mobile application id** | `com.asktabib.app` |
 | **API base** | `https://asktabib.com/api/` |
 | **Audience** | Engineering leads, architects, senior developers, security reviewers |
-| **Related docs** | [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md), [`ENGINEERING_BEST_PRACTICES.md`](./ENGINEERING_BEST_PRACTICES.md), [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md), [`SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md`](./SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md) |
+| **Related docs** | [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md),[`SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md`](./SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md) |
 
 ---
 
