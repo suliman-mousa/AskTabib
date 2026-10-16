@@ -155,5 +155,3 @@ We installed a production-shaped testing stack that fits this repo as it actuall
 The remaining work is coverage of domain screens—not more framework choices. Expand co-located tests module by module, grow the coverage include list with them, and keep E2E reserved for paths where a real browser is the only honest judge.
 
 ---
-
-*Maintainer note: day-to-day commands live in `TESTING.md`. This document is the longer engineering record.*
