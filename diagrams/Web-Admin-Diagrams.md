@@ -4,7 +4,7 @@
 |--------|--------|
 | **System** | AskTabib Admin Dashboard |
 | **Notation** | Mermaid (C4-inspired + sequence + deployment) |
-| **Companion** | [architecture-report.md](./architecture-report.md) |
+| **Companion** | [architecture-report.md](./Web-Admin-Architecture.md) |
 | **Date** | 16 October 2026 |
 | **How to read** | Render in GitHub, VS Code Mermaid preview, or any Mermaid-capable viewer |
 
