@@ -5,7 +5,7 @@
 **Audience:** Engineering leads, reviewers, release stakeholders  
 **Language:** English  
 **Application identity:** `com.asktabib.app` (Flutter package `asktabib_patient`)  
-**Related docs:** [`ARCHITECTURE_REPORT.md`](./ARCHITECTURE_REPORT.md), [`ARCHITECTURE_DIAGRAMS.md`](./ARCHITECTURE_DIAGRAMS.md), [`ENGINEERING_BEST_PRACTICES.md`](./ENGINEERING_BEST_PRACTICES.md), [`GOOGLE_MEET_AND_NOTIFICATIONS.md`](./GOOGLE_MEET_AND_NOTIFICATIONS.md)
+**Related docs:** [`ARCHITECTURE_REPORT.md`](../App-Architecture.md)
 
 ---
 
