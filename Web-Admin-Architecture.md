@@ -8,7 +8,7 @@
 | **Scope** | Web SPA under `/dashboard/`; Laravel API and Firebase are external systems |
 | **Audience** | Engineering leads, architects, maintainers, onboarding |
 | **Date** | 16 October 2026 |
-| **Related** | [testing-report.md](./testing-report.md) · [improvements-report.md](./improvements-report.md) · [diagrams-report.md](./diagrams-report.md) |
+| **Related** | [testing-report.md](./testing-report.md) · [improvements-report.md](./improvements-report.md) · [diagrams-report.md](.diagrams/Web-Admin-Diagrams.md) |
 
 ---
 
@@ -297,4 +297,4 @@ When extending the system:
 5. Protect new routes with `ProtectedRoute`; keep login as the only guest entry.
 6. Extend automated tests at the layer that fails cheapest (unit before E2E).
 
-Visual counterparts for this document live in [diagrams-report.md](./diagrams-report.md).
+Visual counterparts for this document live in [diagrams-report.md](./diagrams/Web-Admin-Diagrams.md).
