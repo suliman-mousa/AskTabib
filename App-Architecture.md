@@ -373,14 +373,5 @@ This AD is current when:
 
 ---
 
-## 15. Document control
-
-| Version | Date | Notes |
-|---------|------|-------|
-| 1.0 | 2026-10-16 | Initial ISO 42010–aligned SAD for dual-role Flutter client |
-| 1.1 | 2026-10-17 | Viewpoint↔concern table; failure/offline view; data view; test strategy; join-window rule (ADR-09); composition root removed from component view; MASVS L1 target |
-
 **Owner:** Mobile Tech Lead. **Review cadence:** on major feature modules, auth/Meet/FCM changes, or packaging identity changes.
 
----
----
