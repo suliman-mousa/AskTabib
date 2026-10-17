@@ -490,7 +490,4 @@ Architecture decisions are recorded as **ADRs**. Material structural changes mus
 
 Copyright (c) AskTabib. All rights reserved. This software is proprietary unless stated otherwise in a `LICENSE` file.
 
-**Maintained by:** TechNova Eagle
-**Website:** https://asktabib.com
-**Security reports:** contact the maintainers privately
 
