@@ -12,23 +12,23 @@
 
 ## How to use this pack
 
-| Priority | Diagram | Why it is “strong” |
+| Priority | Diagram | Why it is "strong" |
 |----------|---------|---------------------|
-| **P0 (primary)** | **D5 — Google Meet end-to-end** | Highest business-critical integration: OAuth, backend tokens, Calendar Meet, FCM, safe join |
+| **P0 (primary)** | **D5 — Google Meet end-to-end** | Highest business-critical integration: OAuth, backend tokens, Calendar Meet, join window, FCM, safe join |
 | P1 | D1 System Context | Onboarding & stakeholder alignment |
 | P1 | D2 Containers | Deployment / integration clarity |
 | P1 | D7 Trust boundaries | Security reviews |
+| P1 | D9 On-device data | Data-lifecycle review |
 | P2 | D3 Components | Module map |
 | P2 | D4 Clean Architecture | Coding standard visual |
 | P2 | D6 FCM → Meet join | Notification ops |
 | P3 | D8 Role routing | Dual-role navigation |
 
-
 ---
 
 ## D1. C4 System Context
 
-**Viewpoint:** System Context (C4 L1)  
+**Viewpoint:** System Context (C4 L1)
 **Concern:** Who uses AskTabib and which external systems it depends on.
 
 ```mermaid
@@ -63,8 +63,8 @@ Rel(doctor, meet, "Joins consultation")
 
 ## D2. C4 Container
 
-**Viewpoint:** Container (C4 L2)  
-**Concern:** Major deployable / runtime units and technology choices.
+**Viewpoint:** Container (C4 L2)
+**Concern:** Major runtime units and technology choices.
 
 ```mermaid
 C4Container
@@ -104,8 +104,10 @@ Rel(ui, meet, "launchUrl allowlisted")
 
 ## D3. C4 Component (Flutter client)
 
-**Viewpoint:** Component (C4 L3)  
+**Viewpoint:** Component (C4 L3)
 **Concern:** Feature modules and shared core.
+
+The composition root (`injection_container.dart`) wires all modules and is omitted for readability. The `google_meet → auth` edge is a documented exception (ADR-08).
 
 ```mermaid
 C4Component
@@ -118,28 +120,21 @@ Container_Boundary(app, "lib/") {
   Component(doctor, "features/doctor", "Doctor shell", "Availability, appointments, finance, profile")
   Component(notif, "features/notifications", "In-app list", "Notification feed")
   Component(meetFeat, "features/google_meet", "Meet linking", "GoogleAuthCubit + OAuth DS")
-  Component(di, "injection_container", "GetIt", "Composition root")
 }
 
 Rel(auth, core, "Uses networking & storage helpers")
 Rel(home, core, "Uses")
 Rel(doctor, core, "Uses")
 Rel(notif, core, "Uses")
-Rel(meetFeat, core, "Uses Dio + token use case")
-Rel(meetFeat, auth, "GetTokenUseCase")
-Rel(di, auth, "Registers")
-Rel(di, home, "Registers")
-Rel(di, doctor, "Registers")
-Rel(di, meetFeat, "Registers")
-Rel(di, notif, "Registers")
-Rel(di, core, "Registers services")
+Rel(meetFeat, core, "Uses Dio")
+Rel(meetFeat, auth, "GetTokenUseCase (ADR-08 exception)")
 ```
 
 ---
 
 ## D4. Clean Architecture dependency rule
 
-**Viewpoint:** Code / layering  
+**Viewpoint:** Code / layering
 **Concern:** Enforceable dependency direction for every feature.
 
 ```mermaid
@@ -178,16 +173,14 @@ flowchart TB
   style Data fill:#fff3e0
 ```
 
-**Rule:** arrows point **inward** toward Domain. UI never imports Dio data sources directly.
+**Rule:** arrows point inward toward Domain. UI never imports Dio data sources directly.
 
 ---
 
 ## D5. Google Meet end-to-end mechanism (PRIMARY)
 
-**Viewpoint:** Dynamic / sequence (highest-value diagram)  
-**Concern:** How a consultation becomes a joinable Google Meet — from doctor linking through push to safe open.
-
-This is the **primary diagram** of the pack: it unifies OAuth, backend authority, Calendar Meet provisioning, FCM, and client URL policy.
+**Viewpoint:** Dynamic / sequence
+**Concern:** How an accepted appointment becomes a joinable Google Meet: doctor linking, provisioning on acceptance, the time-gated join window, push, and safe open.
 
 ```mermaid
 sequenceDiagram
@@ -213,16 +206,23 @@ sequenceDiagram
   API-->>App: Success (optional auth_url)
   Note over API: Tokens stored server-side only
 
-  Note over Doctor,Meet: Phase B — Backend provisions Meet for a consultation
-  API->>Google: Create Calendar event + conferenceData
-  Google-->>API: meet_link (meet.google.com/...)
+  Note over Doctor,Meet: Phase B — Doctor accepts appointment → backend provisions Meet
+  Doctor->>App: Accept appointment
+  App->>API: Accept request
+  alt Doctor linked and token valid
+    API->>Google: Create Calendar event + conferenceData
+    Google-->>API: meet_link (stored server-side)
+    API-->>App: Appointment confirmed (no link released yet)
+  else Not linked / refresh token invalid
+    API-->>App: Refused with error code → prompt to link / re-link
+  end
 
-  Note over Patient,Meet: Phase C — Notify and join
-  API->>FCM: Send data message<br/>type=meeting_link_ready
+  Note over Patient,Meet: Phase C — Join window opens at the scheduled time
+  Patient->>App: Open appointment before scheduled time
+  App-->>Patient: Join disabled (shows scheduled time)
+  API->>FCM: At scheduled time: notification + data<br/>type=meeting_link_ready
   FCM->>App: Push (fg / bg / terminated)
-  App->>App: Parse payload + show join UX
-  Patient->>App: Join / open link
-  Doctor->>App: Join / open link
+  App->>API: Fetch appointment (server releases meet_link only if confirmed AND time reached)
   App->>App: SafeExternalUrl allowlist<br/>host = meet.google.com
   App->>Meet: launchUrl (external / browser / Meet app)
   Patient->>Meet: Consultation
@@ -247,8 +247,10 @@ flowchart LR
     D --> J[RoleMiddleware doctor]
     J --> K[OAuth code exchange]
     K --> L[(Google tokens DB)]
-    L --> M[Calendar create Meet]
-    M --> N[FCM send]
+    L --> M[Calendar create Meet on accept]
+    M --> W{Confirmed AND scheduled time reached?}
+    W -->|yes| N[Release link + FCM send]
+    W -->|no| X[Withhold link]
   end
 
   subgraph GoogleCloud["Google"]
@@ -260,25 +262,39 @@ flowchart LR
   N --> E
 ```
 
+### D5 — failure paths
+
+| Failure | Where detected | Expected outcome |
+|---------|----------------|------------------|
+| Doctor never linked Google | Backend (acceptance) | Acceptance refused with error code; doctor prompted to connect Google first |
+| Refresh token revoked/expired (`invalid_grant`) | Backend (Phase B) | Link marked invalid; doctor notified to re-link; appointment flagged |
+| Join attempted before the scheduled time | Client + backend | Client disables Join; backend rejects early requests and withholds `meet_link` |
+| Non-doctor calls callback | Backend | 403 |
+| Push not delivered / permission denied | Client / FCM | Link available from appointment details and in-app notifications at the scheduled time |
+| `meet_link` host not allowlisted | Client (`SafeExternalUrl`) | Rejected, not launched |
+| Network error during join fetch | Client | Offline banner + Retry; session untouched |
+
 **Invariants encoded by D5**
 
-1. `serverAuthCode` is ephemeral; long-lived Google tokens live only on Laravel.  
-2. Non-doctor callers receive API **403**.  
-3. Join path never trusts arbitrary URLs — only allowlisted Meet hosts.  
-4. FCM project and OAuth project are separate cloud projects (see ops doc).
+1. `serverAuthCode` is ephemeral; long-lived Google tokens live only on Laravel.
+2. Non-doctor callers receive API **403**.
+3. The server, not the client, decides when the join window opens (ADR-09).
+4. Join path never trusts arbitrary URLs, only allowlisted Meet hosts.
 
 ---
 
 ## D6. FCM push and Meet join
 
-**Viewpoint:** Dynamic (notifications)  
+**Viewpoint:** Dynamic (notifications)
 **Concern:** Lifecycle of a meeting-ready push inside the app.
+
+Message type: notification + data, high priority. Background/terminated display is handled by the OS; foreground by `onMessage`.
 
 ```mermaid
 sequenceDiagram
   participant API as Laravel
   participant FCM as Firebase
-  participant BG as Background Handler
+  participant OS as OS notification tray
   participant PS as FcmService / Handler
   participant PL as PushNotificationPayload
   participant LOC as LocalNotificationService
@@ -287,26 +303,25 @@ sequenceDiagram
 
   API->>FCM: HTTP v1 send (device token)
   alt App terminated / background
-    FCM->>BG: Data / notification
-    BG->>LOC: May display local notification
+    FCM->>OS: Notification + data (generic text)
+    Note over OS,PS: User taps notification → app opens with data
   else App foreground
     FCM->>PS: onMessage
     PS->>PL: Parse type / meet_link
     PL->>LOC: Local alert if needed
   end
-  Note over PS,NAV: User taps notification or overlay Join
   PS->>NAV: Route by type
   NAV->>SAFE: Validate meet_link
   SAFE-->>NAV: Allowed → launch
 ```
 
-**Typical data keys:** `type = meeting_link_ready`, `meet_link = https://meet.google.com/...`
+**Typical data keys:** `type = meeting_link_ready`, `meet_link = https://meet.google.com/...`. On iOS, delivery depends on APNs configuration (tracked as incomplete).
 
 ---
 
 ## D7. Trust boundaries & secret placement
 
-**Viewpoint:** Security / deployment  
+**Viewpoint:** Security / deployment
 **Concern:** Where secrets and tokens are allowed to exist.
 
 ```mermaid
@@ -356,7 +371,7 @@ flowchart TB
 
 ## D8. Dual-role navigation (supporting)
 
-**Viewpoint:** Application behavior  
+**Viewpoint:** Application behavior
 **Concern:** Patient vs doctor shell after auth.
 
 ```mermaid
@@ -370,8 +385,34 @@ flowchart TD
   GATE -->|no| HOME
   DHOME --> MEETUI[Connect Google Meet]
   HOME --> BOOK[Booking + appointments]
-  NOTE[FCM meeting_link_ready] --> JOIN[Join Meet UX — both roles]
+  NOTE[FCM meeting_link_ready] --> JOIN[Join Meet UX — both roles, at scheduled time]
   JOIN --> SAFE[SafeExternalUrl]
+```
+
+Client gates are UX only; the server enforces RBAC.
+
+---
+
+## D9. On-device data
+
+**Viewpoint:** Data
+**Concern:** What is stored on the device and when it is removed.
+
+```mermaid
+flowchart LR
+  subgraph Device["On device"]
+    SS[(Secure Storage<br/>Sanctum token)]
+    MEM[(Memory only<br/>role, profile, API responses<br/>with health context)]
+    CACHE[(Disk cache<br/>images, size-capped)]
+    PREF[(SharedPreferences<br/>language, theme)]
+    FT[FCM token]
+  end
+  LOGOUT[Logout / 401] -->|clears| SS
+  LOGOUT -->|clears| MEM
+  LOGOUT -->|clears| CACHE
+  LOGOUT -->|removes| FT
+  FT -->|upsert| API[Laravel API]
+  PUSH[Push payload] -.->|generic text, no medical detail,<br/>not persisted| Device
 ```
 
 ---
@@ -388,23 +429,19 @@ flowchart TD
 | D6 | FCM → Meet join | Sequence | P2 |
 | D7 | Trust & secrets | Security | P1 |
 | D8 | Role routing | Behavioral | P3 |
+| D9 | On-device data | Data | P1 |
 
 ---
 
 ## Maintenance rule
 
-When any of the following change, update **D5** (and usually D1/D2/D7) in the same change set:
+When any of the following change, update **D5** (and usually D1/D2/D7/D9) in the same change set:
 
-- OAuth callback path or payload  
-- Meet provisioning ownership (who creates the link)  
-- FCM meeting payload contract  
-- Allowlisted hosts for Meet / media  
+- OAuth callback path or payload
+- Meet provisioning ownership or trigger, or the join-window rule
+- FCM meeting payload contract or message type
+- Allowlisted hosts for Meet / media
 - Application id / OAuth client binding
+- What is stored on the device
 
 ---
-
-## Document control
-
-| Version | Date | Notes |
-|---------|------|-------|
-| 1.0 | 2026-10-16 | Initial diagram pack; D5 designated primary (Google Meet mechanism) |
