@@ -60,7 +60,6 @@ A global 70% threshold over all of `src/` would fail immediately on a large unte
 - **Threshold-enforced set (70% lines/functions):** modules in the `include` list, which grows as co-located tests land.
 - **Global report (no threshold):** coverage over all of `src/` is generated alongside, so the true project-wide number is always visible. The enforced percentage must never be quoted as project coverage.
 
-Current global figure: **[X]%** (as of the last run).
 
 ### 4.4 E2E only for critical paths
 Playwright covers admin sign-in, with API traffic stubbed via `page.route`. Broader journeys (appointments, doctors CRUD, FCM) stay out of E2E on purpose; they are better as RTL + MSW until the product surface stabilizes.
@@ -79,22 +78,16 @@ Playwright covers admin sign-in, with API traffic stubbed via `page.route`. Broa
 | URL safety | `src/utils/safeUrl.test.js` | Only `http`/`https` accepted |
 | Timezone mapping | `src/utils/timezone.test.js` | `Europe/*` → Berlin; `Asia/*` and anything else → Damascus; `Intl` failure fallback |
 | Auth session | `src/utils/auth.test.js` | Token expiry, storage cleanup, resolve token/user |
-| Role admission | `[file]` | Only `role: admin` (case-insensitive) creates a session; other roles are rejected and nothing is persisted |
-| Stale sessions | `[file]` | `isAuthenticated()` clears non-admin local sessions |
-| Session validation | `[file]` | Startup validation against the server; invalid or tampered sessions are cleared |
-| FCM payload allowlist | `[file]` | Only `admin_booking_received` updates the UI; other payloads are ignored |
-| Login lockout | `[file]` | 60 s client lockout after five failures (UX layer; server rate limiting is the real control) |
+| Role admission | — | Only `role: admin` (case-insensitive) creates a session; other roles are rejected and nothing is persisted |
+| Stale sessions | — | `isAuthenticated()` clears non-admin local sessions |
+| Session validation | — | Startup validation against the server; invalid or tampered sessions are cleared |
+| FCM payload allowlist | — | Only `admin_booking_received` updates the UI; other payloads are ignored |
+| Login lockout | — | 60 s client lockout after five failures (UX layer; server rate limiting is the real control) |
 | API hook | `src/hooks/useApi.test.jsx` | Success payload and field errors via MSW override |
 | Language UI | `src/components/LanguageSwitcher.test.jsx` | userEvent language switch by role |
 | A11y | `src/components/LanguageSwitcher.a11y.test.jsx` | No axe violations on the switcher |
 | Pagination | `src/components/Pagination.test.jsx` | Next calls `onPage`; Previous disabled on page 1 |
 | E2E login | `e2e/login.spec.ts` | Form visible; successful login (stub returns `role: "admin"`) lands on `/dashboard/home` |
-
-**Last local verification ([date]):**
-
-- `npm run test:run`: **[N]** tests passed
-- `npm run test:coverage`: thresholds met on the scoped set; global coverage **[X]%**
-- `npx playwright test`: **[N/N]** passed (Chromium, Firefox, WebKit)
 
 ### 5.1 Deliberately not tested (and why)
 
