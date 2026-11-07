@@ -8,7 +8,7 @@
 | **Scope** | Web SPA under `/dashboard/`; Laravel API and Firebase are external systems |
 | **Audience** | Engineering leads, architects, maintainers, onboarding |
 | **Date** | 16 October 2026 |
-| **Related** | [testing-report.md](./TEST/Web-Admin-Testing-Report.md) · [improvements-report.md](./engineering%20Improvements/Web-Admin-Improvements-Report.md) · [diagrams-report.md](./diagrams/Web-Admin-Diagrams.md) |
+| **Related** | [Web-Admin-Testing-Report.md](./TEST/Web-Admin-Testing-Report.md) · [Web-Admin-Improvements-Report.md](./engineering%20Improvements/Web-Admin-Improvements-Report.md) · [Web-Admin-Diagrams.md](./diagrams/Web-Admin-Diagrams.md) |
 
 ---
 
@@ -255,7 +255,7 @@ Trust boundary C — Firebase
 | E2E | Playwright (Chromium, Firefox, WebKit) | Critical admin login path |
 | CI | `.github/workflows/ci.yml` | Automated gate + artifacts |
 
-Full detail: [testing-report.md](./testing-report.md).
+Full detail: [Web-Admin-Testing-Report.md](./TEST/Web-Admin-Testing-Report.md).
 
 ---
 
@@ -297,4 +297,4 @@ When extending the system:
 5. Protect new routes with `ProtectedRoute`; keep login as the only guest entry.
 6. Extend automated tests at the layer that fails cheapest (unit before E2E).
 
-Visual counterparts for this document live in [diagrams-report.md](./diagrams/Web-Admin-Diagrams.md).
+Visual counterparts for this document live in [Web-Admin-Diagrams.md](./diagrams/Web-Admin-Diagrams.md).

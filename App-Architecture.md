@@ -12,7 +12,7 @@
 | **API base** | `https://asktabib.com/api/` |
 | **Audience** | Engineering leads, architects, senior developers, security reviewers |
 | **Owner** | Mobile Tech Lead |
-| **Related docs** | [`ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md), [`SECURITY_PERFORMANCE_ARCHITECTURE_IMPROVEMENTS.md`](./engineering%20Improvements/APP-IMPROVEMENT-REPORT.md) |
+| **Related docs** | [`APP_ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md), [`APP-IMPROVEMENT-REPORT.md`](./engineering%20Improvements/APP-IMPROVEMENT-REPORT.md) |
 
 **Convention.** Behaviors described as *standard* in §7.5, §8 and §12 are the target posture following industry best practice. Verify each against the implementation during review; any deviation is recorded as a risk or an ADR.
 
@@ -176,10 +176,10 @@ Canonical vertical slice and dependency rule: [`ARCHITECTURE_DIAGRAMS.md` § D4]
 3. Firebase initialize
 4. Register background FCM handler
 5. GetIt `init()`
-6. FCM + push handler initialize
-7. `runApp(AskTabibApp)`
+6. `runApp(AskTabibApp)`
+7. After the first frame: FCM + push handler initialize (deferred via a post-frame callback)
 
-Push is wired after DI; Firebase before messaging.
+Firebase core and the background handler are ready before `runApp`; foreground push wiring is deferred until after the first frame so it does not delay the first interactive screen.
 
 ### 7.2 Authentication and role home
 1. Auth use cases obtain the Sanctum token → secure storage.
@@ -367,7 +367,7 @@ Users are located in Germany and Syria. For EU users the client must support a G
 This AD is current when:
 1. Feature modules obey Presentation → Domain ← Data (exceptions only via ADR).
 2. New privileged integrations (OAuth, payments, media) keep secrets off-device.
-3. Diagrams in [`ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md) are updated for material structural change.
+3. Diagrams in [`APP_ARCHITECTURE_DIAGRAMS.md`](./diagrams/APP_ARCHITECTURE_DIAGRAMS.md) are updated for material structural change.
 
 **Change control:** treat material architecture changes as ADRs (append to §9) and update the C4 / sequence diagrams in the same PR when feasible.
 

@@ -134,7 +134,7 @@ A browser console for platform operators, served under `/dashboard/`.
 
 ### 4.3 Backend API
 
-A Laravel REST API providing authentication (Sanctum), RBAC, appointment and doctor domains, Google token exchange, Meet provisioning, FCM dispatch and rate limiting.
+A Laravel REST API on MySQL providing authentication (Sanctum), RBAC, appointment and doctor domains, Google token exchange, Meet provisioning, FCM dispatch and rate limiting. The backend (data model, API design, authorization, and integrations) was designed and its development supervised by the project's systems architect / tech lead. Appointment status changes are synchronized in real time across the patient app, doctor app, and admin dashboard.
 
 ---
 
@@ -272,7 +272,7 @@ Slot: 18:00 local     <->      Sees:  17:00 local
 |-------|--------------|
 | **Mobile** | Flutter, Dart, `flutter_bloc` (Cubit), GetIt, Dio, `dartz`, `flutter_screenutil`, ARB localization |
 | **Admin web** | Vite 7, React 19, Axios, Zustand, i18next, React Router |
-| **Backend** | Laravel, Sanctum, MySQL-compatible database |
+| **Backend** | Laravel, Sanctum, MySQL |
 | **Push** | Firebase Cloud Messaging, local notifications, service worker (web) |
 | **Video** | Google Calendar API, Google Meet |
 | **Real-time (optional)** | Laravel Echo / Pusher |
